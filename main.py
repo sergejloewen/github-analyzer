@@ -1,10 +1,10 @@
 import requests
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # Datenmodell für ein GitHub-Repository
 class GitHubUserRepo(BaseModel):
     name: str
-    stars: int
+    stars: int = Field(alias='stargazers_count')
     language: str | None = 'Unknown'
     commits: int | None = 0
     description: str | None = None
@@ -31,13 +31,7 @@ def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
     
     # Create GitHubUserRepo instances from the raw data and append them to the list
     for repo_data in raw_data:
-        repo = GitHubUserRepo(
-            name=repo_data['name'],
-            stars=repo_data['stargazers_count'],
-            language=repo_data.get('language', 'Unknown'),
-            commits=repo_data.get('commits', 0),
-            description=repo_data.get('description', None)
-        )
+        repo = GitHubUserRepo(**repo_data)
 
         # Handle cases where Language is None
         if repo.language is None:
