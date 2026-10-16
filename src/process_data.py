@@ -1,7 +1,5 @@
-from collections import Counter
-
-import requests
 from pydantic import BaseModel, Field
+import requests
 
 # Datenmodell für ein GitHub-Repository
 class GitHubUserRepo(BaseModel):
@@ -100,18 +98,3 @@ def visualize_repos(user_repos: list[GitHubUserRepo], stats: UserStats) -> None:
     print(f"Total Commits: {stats.total_commits}")
     print(f"Average Stars per Repository: {stats.average_stars_per_repo:.2f}")
     print(f"Most Used Language: {stats.most_used_language}")
-
-def main():
-    # checking if the Github API is reachable
-    githubAPI = requests.get("https://api.github.com")
-    print(githubAPI.status_code)
-
-    username = get_user_input()
-    raw_data = fetch_user_repos(username)
-    user_repos = analyze_repos(raw_data)
-    stats = calculate_stats(user_repos)
-    visualize_repos(user_repos, stats)
-
-
-if __name__ == "__main__":
-    main()
