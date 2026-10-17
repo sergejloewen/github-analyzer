@@ -1,8 +1,11 @@
 from pydantic import BaseModel, Field
 import requests
 
-# Datenmodell für ein GitHub-Repository
 class GitHubUserRepo(BaseModel):
+    """
+    Data model representing a GitHub repository with relevant fields.
+    """
+
     name: str
     stars: int = Field(alias='stargazers_count')
     language: str | None = 'Unknown'
@@ -10,26 +13,39 @@ class GitHubUserRepo(BaseModel):
     description: str | None = None
 
 class UserStats(BaseModel):
+    """
+    Data model representing statistics about a user's GitHub repositories.
+    """
+
     total_repos: int
     total_stars: int
     total_commits: int
     average_stars_per_repo: float
     most_used_language: str | None = None
 
-# Get the username from the user
 def get_user_input() -> str:
+    """
+    Prompt the user to enter a GitHub username.
+    """
+    
     return input("Enter a GitHub username: ")
 
-# Fetch the user's repositories from the GitHub API
 def fetch_user_repos(username: str) -> list[dict]:
+    """
+    Fetch the user's repositories from the GitHub API
+    """
     #TODO fetch the number of commits for each repository made by the user
+
     url = f"https://api.github.com/users/{username}/repos"
     response = requests.get(url)
     response.raise_for_status()  # Raise an exception for HTTP errors
     return response.json()
 
-# Filter data and create GitHubUserRepo instances
 def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
+    """
+    Filter raw data and create GitHubUserRepo instances
+    """
+
     user_repos = []
 
     # check if list is empty or none
@@ -48,8 +64,12 @@ def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
         user_repos.append(repo) # think about using yield if necessary
 
     return user_repos
-# calculate statistics based on the user's repositories
+
 def calculate_stats(user_repos: list[GitHubUserRepo]) -> UserStats:
+    """
+    calculate statistics based on the user's repositories
+    """
+
     total_repos = len(user_repos)
     total_stars = sum(repo.stars for repo in user_repos)
     total_commits = sum(repo.commits for repo in user_repos)
@@ -81,12 +101,17 @@ def calculate_stats(user_repos: list[GitHubUserRepo]) -> UserStats:
         most_used_language=most_used_language
     )
 
-# Visualize the user's repositories and statistics in a simple table format in CLI
 def visualize_repos(user_repos: list[GitHubUserRepo], stats: UserStats) -> None:
+    """
+    Visualize the user's repositories and statistics in a simple table format in CLI
+    """
+
+    # Check if there are any repositories to visualize
     if not user_repos:
         print("No public repositories to visualize.")
         return
     
+    # Print the table for user repositories and their statistics
     print(f"\n{'Repository':<30} {'Commits':<10} {'Stars':<10} {'Language':<15}")
     print("-" * 70)
     for repo in user_repos:
