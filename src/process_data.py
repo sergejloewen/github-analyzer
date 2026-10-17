@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 import requests
+import exceptions as ex
 
 class GitHubUserRepo(BaseModel):
     """
@@ -27,8 +28,27 @@ def get_user_input() -> str:
     """
     Prompt the user to enter a GitHub username.
     """
-    
+
     return input("Enter a GitHub username: ")
+
+def safe_get(url: str) -> requests.Response:
+    """
+    Perform a GET request to the specified URL and handle potential exceptions.
+    """
+
+    try:
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return response
+    except requests.exceptions.HTTPError as err:
+        if response.status_code == 404:
+            raise ex.GitHubUserNotFoundError(f"GitHub user not found or does not exist. (HTTP Status code: {response.status_code})") from err
+        elif response.status_code in [403, 429]:
+            raise ex.GitHubRateLimitError(f"GitHub API rate limit exceeded. (HTTP Status code: {response.status_code})") from err
+        else:
+            raise ex.GitHubAPIError(f"GitHub API returned an error. (HTTP Status code: {response.status_code})") from err
+    except requests.exceptions.connectionError as err:
+        raise ex.GitHubNetworkError("Network error occurred while trying to access the GitHub API.") from err
 
 def fetch_user_repos(username: str) -> list[dict]:
     """
@@ -37,8 +57,7 @@ def fetch_user_repos(username: str) -> list[dict]:
     #TODO fetch the number of commits for each repository made by the user
 
     url = f"https://api.github.com/users/{username}/repos"
-    response = requests.get(url)
-    response.raise_for_status()  # Raise an exception for HTTP errors
+    response = safe_get(url)
     return response.json()
 
 def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
