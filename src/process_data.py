@@ -28,7 +28,8 @@ def get_user_input() -> str:
     """
     Prompt the user to enter a GitHub username.
     """
-
+    #TODO: Add input validation to ensure the username is valid 
+    # and within length limits (e.g., no special characters, not empty, etc.)
     return input("Enter a GitHub username: ")
 
 def safe_get(url: str) -> requests.Response:
@@ -54,7 +55,8 @@ def fetch_user_repos(username: str) -> list[dict]:
     """
     Fetch the user's repositories from the GitHub API
     """
-    #TODO fetch the number of commits for each repository made by the user
+    #TODO fetch the number of commits for each repository made by the user, 
+    # might require changing another method as the data might be already in the raw_data, but is not being used and calculated in the GitHubUserRepo Class
 
     url = f"https://api.github.com/users/{username}/repos"
     response = safe_get(url)
