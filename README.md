@@ -27,9 +27,9 @@ WIP
 
 Set up the virtual python environment, download and install all the necessary packages from the requirements.txt.
 
-```text
-on Windows: 
+On Windows:
 
+```text
 python -m venv .venv
 .venv\Scripts\activate
 python -m pip install -r requirements.txt
