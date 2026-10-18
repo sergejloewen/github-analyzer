@@ -49,7 +49,7 @@ def safe_get(url: str) -> requests.Response:
             raise ex.GitHubRateLimitError(f"GitHub API rate limit exceeded. (HTTP Status code: {response.status_code})") from err
         else:
             raise ex.GitHubAPIError(f"GitHub API returned an error. (HTTP Status code: {response.status_code})") from err
-    except requests.exceptions.connectionError as err:
+    except requests.exceptions.ConnectionError as err:
         raise ex.GitHubNetworkError("Network error occurred while trying to access the GitHub API.") from err
 
 def fetch_user_repos(username: str) -> list[dict]:
