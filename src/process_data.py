@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 import requests
 import exceptions as ex
 
+# potentially add validation and testing for the models
 class GitHubUserRepo(BaseModel):
     """
     Data model representing a GitHub repository with relevant fields.
@@ -109,10 +110,16 @@ def calculate_stats(user_repos: list[GitHubUserRepo]) -> UserStats:
         else:
             total_languages[repo.language] += 1
 
-    del total_languages['Unknown']  # Remove 'Unknown' from the language count
+    # remove 'Unknown' from the language count if it exists
+    if 'Unknown' in total_languages:
+        del total_languages['Unknown']
 
-    # find the most used language in the list of repositories, Unknown and None are filtered out already
-    most_used_language = max(total_languages, key=total_languages.get)
+    # find the most used language in the list of repositories if the list is not empty,
+    # Unknown and None are filtered out already
+    if not total_languages:
+        most_used_language = 'Unknown'
+    else:
+        most_used_language = max(total_languages, key=total_languages.get)
 
     return UserStats(
         total_repos=total_repos,
