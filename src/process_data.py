@@ -8,6 +8,9 @@ class GitHubUserRepo(BaseModel):
     Data model representing a GitHub repository with relevant fields.
     """
 
+    id: int | None = None
+    owner_id: int | None = None
+    owner_username: str | None = None
     name: str
     stars: int = Field(alias='stargazers_count')
     language: str | None = 'Unknown'
@@ -19,6 +22,8 @@ class UserStats(BaseModel):
     Data model representing statistics about a user's GitHub repositories.
     """
 
+    id: int | None = None
+    username: str | None = None
     total_repos: int
     total_stars: int
     total_commits: int
@@ -63,6 +68,15 @@ def fetch_user_repos(username: str) -> list[dict]:
     response = safe_get(url)
     return response.json()
 
+def fetch_user_id(username: str) -> int:
+    """
+    Fetch the user's ID from the GitHub API
+    """
+    url = f"https://api.github.com/users/{username}"
+    response = safe_get(url)
+    user_data = response.json()
+    return user_data.get("id", None)
+
 def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
     """
     Filter raw data and create GitHubUserRepo instances
@@ -83,15 +97,26 @@ def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
         if repo.language is None:
             repo.language = 'Unknown'
 
+        # Adds owner_username and owner_id to the GitHubUserRepo instance
+        # As the GitHub API returns the owner information in a nested dictionary, 
+        # we need to extract it and assign it to the respective fields in the GitHubUserRepo instance.    
+        if repo.owner_username is None:
+            repo.owner_username = repo_data.get('owner', {}).get('login', None)
+
+        if repo.owner_id is None:
+            repo.owner_id = repo_data.get('owner', {}).get('id', None)
+
         user_repos.append(repo) # think about using yield if necessary
 
     return user_repos
 
-def calculate_stats(user_repos: list[GitHubUserRepo]) -> UserStats:
+def calculate_stats(user_repos: list[GitHubUserRepo], user_id: int, username: str) -> UserStats:
     """
     calculate statistics based on the user's repositories
     """
 
+    id = user_id
+    username = username
     total_repos = len(user_repos)
     total_stars = sum(repo.stars for repo in user_repos)
     total_commits = sum(repo.commits for repo in user_repos)
@@ -122,6 +147,8 @@ def calculate_stats(user_repos: list[GitHubUserRepo]) -> UserStats:
         most_used_language = max(total_languages, key=total_languages.get)
 
     return UserStats(
+        id=id,
+        username=username,
         total_repos=total_repos,
         total_stars=total_stars,
         total_commits=total_commits,

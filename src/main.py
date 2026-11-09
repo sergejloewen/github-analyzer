@@ -7,9 +7,10 @@ def main():
     print(githubAPI.status_code)
 
     username = pd.get_user_input()
+    user_id = pd.fetch_user_id(username)
     raw_data = pd.fetch_user_repos(username)
     user_repos = pd.analyze_repos(raw_data)
-    stats = pd.calculate_stats(user_repos)
+    stats = pd.calculate_stats(user_repos, user_id, username)
     pd.visualize_repos(user_repos, stats)
 
 
