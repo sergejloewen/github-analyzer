@@ -27,6 +27,7 @@ def raw_json_data():
             "private": False,
             "html_url": "https://github.com/testuser/python-data-analyzer",
             "description": "Ein tolles Projekt zur Datenanalyse",
+            "owner": {"login": "testuser", "id": 1},
             "stargazers_count": 12,
             "watchers_count": 12,
             "language": "Python",
@@ -43,6 +44,7 @@ def raw_json_data():
             "private": False,
             "html_url": "https://github.com/testuser/my-portfolio-website",
             "description": None,
+            "owner": {"login": "testuser", "id": 1},
             "stargazers_count": 3,
             "watchers_count": 3,
             "language": "TypeScript",
@@ -59,6 +61,7 @@ def raw_json_data():
             "private": False,
             "html_url": "https://github.com/testuser/smart-home-automation",
             "description": None,
+            "owner": {"login": "testuser", "id": 1},
             "stargazers_count": 3,
             "watchers_count": 3,
             "language": None,
@@ -77,6 +80,9 @@ def filtered_user_repos():
     """
     return [
         pd.GitHubUserRepo(
+            id=12345678,
+            owner_id=1,
+            owner_username="testuser",
             name="python-data-analyzer",
             starsgazers=12,
             language="Python",
@@ -84,6 +90,9 @@ def filtered_user_repos():
             description="Ein tolles Projekt zur Datenanalyse",
         ),
         pd.GitHubUserRepo(
+            id=87654321,
+            owner_id=1,
+            owner_username="testuser",
             name="my-portfolio-website",
             stars=3,
             language="TypeScript",
@@ -91,6 +100,9 @@ def filtered_user_repos():
             description="",
         ),
         pd.GitHubUserRepo(
+            id=12387543,
+            owner_id=1,
+            owner_username="testuser",
             name="smart-home-automation",
             stars=3,
             language="Unknown",
@@ -98,6 +110,13 @@ def filtered_user_repos():
             description="",
         )
     ]
+
+@pytest.fixture
+def user_id_name():
+    """
+    Fixture providing valid user id and username for testing calculate_stats function.
+    """
+    return 1, "testuser"
 
 
 def test_fetch_user_repos_valid_username():
@@ -235,6 +254,15 @@ def test_analyze_repos_with_valid_data(raw_json_data):
     assert isinstance(result, list)
     assert all(isinstance(repo, pd.GitHubUserRepo) for repo in result)
     assert len(result) == len(raw_json_data)
+    assert result[0].name == raw_json_data[0]["name"]
+    assert result[0].stars == raw_json_data[0]["stargazers_count"]
+    assert result[0].id == raw_json_data[0]["id"]
+    assert result[1].name == raw_json_data[1]["name"]
+    assert result[1].stars == raw_json_data[1]["stargazers_count"]
+    assert result[1].id == raw_json_data[1]["id"]
+    assert result[2].name == raw_json_data[2]["name"]
+    assert result[2].stars == raw_json_data[2]["stargazers_count"]
+    assert result[2].id == raw_json_data[2]["id"]
 
 def test_calculate_stats_with_empty_repos():
     """
@@ -243,36 +271,45 @@ def test_calculate_stats_with_empty_repos():
     """
 
     empty_user_repos = []
-    stats = pd.calculate_stats(empty_user_repos)
+    stats = pd.calculate_stats(empty_user_repos, None, None)
+    assert isinstance(stats, pd.UserStats)
+    assert stats.id == None
+    assert stats.username == None
     assert stats.total_repos == 0
     assert stats.total_stars == 0
     assert stats.total_commits == 0
     assert stats.average_stars_per_repo == 0.0
     assert stats.most_used_language is 'Unknown'
 
-def test_calculate_stats_with_valid_repos(raw_json_data):
+def test_calculate_stats_with_valid_repos(raw_json_data, user_id_name):
     """
     Test calculating statistics with a valid list of user repositories.
     Should return UserStats with correct calculated values.
     """
 
+    user_id, username = user_id_name
     user_repos = pd.analyze_repos(raw_json_data)
-    stats = pd.calculate_stats(user_repos)
+    stats = pd.calculate_stats(user_repos, user_id, username)
+    
 
+    assert isinstance(stats, pd.UserStats)
+    assert stats.id == user_id
+    assert stats.username == username
     assert stats.total_repos == len(user_repos)
     assert stats.total_stars == sum(repo.stars for repo in user_repos)
     assert stats.total_commits == sum(repo.commits for repo in user_repos)
     assert stats.average_stars_per_repo == (stats.total_stars / stats.total_repos) if stats.total_repos > 0 else 0.0
     assert stats.most_used_language in [repo.language for repo in user_repos if repo.language != 'Unknown']
 
-def test_visualize_repos_with_valid_data(raw_json_data):
+def test_visualize_repos_with_valid_data(raw_json_data, user_id_name):
     """
     Test visualizing repositories with valid user repositories.
     Should not raise any exceptions.
     """
 
+    user_id, username = user_id_name
     user_repos = pd.analyze_repos(raw_json_data)
-    stats = pd.calculate_stats(user_repos)
+    stats = pd.calculate_stats(user_repos, user_id, username)
     pd.visualize_repos(user_repos, stats)  # Should not raise any exceptions
 
     assert True  # If no exceptions are raised, the test passes
@@ -284,7 +321,7 @@ def test_visualize_repos_with_empty_data(capsys):
     """
 
     empty_user_repos = []
-    stats = pd.calculate_stats(empty_user_repos)
+    stats = pd.calculate_stats(empty_user_repos, None, None)
     pd.visualize_repos(empty_user_repos, stats)  # Should not raise any exceptions
     captured = capsys.readouterr()
 
