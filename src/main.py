@@ -13,10 +13,13 @@ def main():
     raw_data = pd.fetch_user_repos(username)
     user_repos = pd.analyze_repos(raw_data)
     stats = pd.calculate_stats(user_repos, user_id, username)
-    # pd.visualize_repos(user_repos, stats)
+
+    # commented out as not needed for future implementation, but can be used for visualization of the data
+    # in Console for testing and debugging purposes. Can be uncommented if needed.
+    # pd.visualize_repos(user_repos, stats)  
 
     # Save the user, their statistics and repositories to the database
-    with db.SessionLocal() as session:
+    with db.get_db() as session:
         iDB.save_user_profile(session, stats, user_repos)
 
 if __name__ == "__main__":

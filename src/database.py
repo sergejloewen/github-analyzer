@@ -2,6 +2,7 @@ from sqlalchemy import ForeignKey, create_engine
 from sqlalchemy.orm import Mapped, mapped_column, relationship, sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from typing import Optional
+from contextlib import contextmanager
 
 engine = create_engine('sqlite+pysqlite:///github_data.db', echo=True)
 SessionLocal = sessionmaker(bind=engine)
@@ -35,6 +36,8 @@ class User(Base):
     average_stars_per_repo: Mapped [float]
     most_used_language: Mapped [str]
 
+# Context manager to handle database sessions
+@contextmanager
 def get_db():
     with SessionLocal() as session:
         yield session
