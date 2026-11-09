@@ -1,7 +1,7 @@
 # Github Analyzer
 
-Github Analyzer is a CLI Tool to collect, analyze and visualize GitHub Users repository data.
-It will have a backend API and a web dashboard in the future.
+Github Analyzer is a Tool to collect, analyze and visualize GitHub Users repository data, 
+which will be stored in a database and serve the future API and web dashboard.
 
 ## Purpose of this App
 
@@ -15,10 +15,10 @@ WIP
 ## Tech Stack
 
 - Python
-- FastAPI
+- FastAPI (WIP)
 - Pydantic
-- SQLAlchemy (WIP)
-- PostgreSQL / zunächst SQLite (WIP)
+- SQLAlchemy
+- PostgreSQL (WIP) / zunächst SQLite
 - pytest
 - Docker (WIP)
 - GitHub Actions (WIP)
@@ -39,6 +39,7 @@ python -m pip install -r requirements.txt
 
 Pytest is used for testing the app and in the test_process_data.py file there are all the tests written
 for both process_data.py and exceptions.py, as they are closely related.
+TODO: Write tests for the database operations
 
 ## Screenshots/ GIFs
 
@@ -50,7 +51,7 @@ WIP
 
 ## Future Plans
 
-- Integration of a database with sqlite, and then PostgresSQL later
+- Upgrading Database to PostgresSQL
 - Web Dashboard
 - Docker and Docker image for easy Setup
 - GitHub Actions for automatic Build Testing
