@@ -1,6 +1,6 @@
 # Github Analyzer
 
-Github Analyzer is a Tool to collect, analyze and visualize GitHub Users repository data, 
+Github Analyzer is a Tool to collect, analyze and visualize GitHub Users repository data,
 which will be stored in a database and serve the future API and web dashboard.
 
 ## Purpose of this App
