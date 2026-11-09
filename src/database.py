@@ -1,10 +1,10 @@
 from sqlalchemy import ForeignKey, create_engine
 from sqlalchemy.orm import Mapped, mapped_column, relationship, sessionmaker
-from sqlalchemy import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase
 from typing import Optional
 
 engine = create_engine('sqlite+pysqlite:///github_data.db', echo=True)
-session = sessionmaker(bind=engine)()
+SessionLocal = sessionmaker(bind=engine)
 
 # Define the base class for declarative models
 class Base(DeclarativeBase):
@@ -28,12 +28,15 @@ class User(Base):
 
     id: Mapped [int] = mapped_column(primary_key=True)
     username: Mapped [str]
-    repos: Mapped [list[Repo]] = relationship(back_populates="owner")
+    repos: Mapped [list[Repo]] = relationship(back_populates="owner", cascade="all, delete-orphan")
     total_repos: Mapped [int]
     total_stars: Mapped [int]
     total_commits: Mapped [int]
     average_stars_per_repo: Mapped [float]
     most_used_language: Mapped [str]
 
+def get_db():
+    with SessionLocal() as session:
+        yield session
 
 Base.metadata.create_all(bind=engine)
