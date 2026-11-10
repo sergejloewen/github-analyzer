@@ -3,7 +3,7 @@ import process_data as pd
 import database as db
 import interact_db as iDB
 from fastapi import FastAPI, Depends, HTTPException
-from . import schemas as res
+import schemas as res
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
 
