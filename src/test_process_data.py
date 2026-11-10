@@ -118,21 +118,28 @@ def user_id_name():
     """
     return 1, "testuser"
 
-
-def test_fetch_user_repos_valid_username():
+@responses.activate
+def test_fetch_user_repos_valid_username(raw_json_data):
     """
     Test fetching repositories for a valid GitHub username.
     """
+
+    responses.add(
+        responses.GET,
+        "https://api.github.com/users/octocat/repos",
+        json=raw_json_data,
+        status=200
+    )
 
     username = "octocat" # valid GitHub username
     repos = pd.fetch_user_repos(username)
     assert isinstance(repos, list)
     assert all(isinstance(repo, dict) for repo in repos)
     assert len(repos) > 0 # Assuming octocat has public repositories
-    assert len(repos) == 8 # Assuming octocat has 8 public repositories
+    assert len(repos) == 3 # Assuming octocat has 3 public repositories
     assert all('name' in repo for repo in repos) # Check if 'name' key exists in each repo dictionary
 
-
+@responses.activate
 def test_fetch_user_repos_invalid_username():
     """
     Test fetching repositories for an invalid GitHub username.
@@ -140,10 +147,16 @@ def test_fetch_user_repos_invalid_username():
     """
 
     invalid_username = "thisuserdoesnotexist1234567890"
+    url = f"https://api.github.com/users/{invalid_username}/repos"
+
+    # Mock the API response to simulate a 404 Not Found for an invalid username
+    responses.add(responses.GET, url, status=404)
+
     with pytest.raises(ex.GitHubUserNotFoundError) as exc_info:
         pd.fetch_user_repos(invalid_username)
     assert exc_info.type == ex.GitHubUserNotFoundError
 
+@responses.activate
 def test_fetch_user_repos_empty_username():
     """
     Test fetching repositories for an empty GitHub username.
@@ -151,6 +164,11 @@ def test_fetch_user_repos_empty_username():
     """
 
     empty_username = ""
+    url = f"https://api.github.com/users/{empty_username}/repos"
+
+    # Mock the API response to simulate a 404 Not Found for an empty username
+    responses.add(responses.GET, url, status=404)
+    
     with pytest.raises(ex.GitHubUserNotFoundError) as exc_info:
         pd.fetch_user_repos(empty_username)
     assert exc_info.type == ex.GitHubUserNotFoundError
