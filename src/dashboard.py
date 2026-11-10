@@ -43,9 +43,19 @@ if st.session_state.get("analyze_button"):
                                          'Average Stars per Repo': user_data['average_stars_per_repo'],
                                          'Most Used Language': user_data['most_used_language']}])
                 st.dataframe(df_user)
+
                 # Repositories of the user
                 df_repos = pd.DataFrame(user_data['repos'])
-                st.dataframe(df_repos[['name', 'language', 'stars', 'commits']])
+                if not df_repos.empty:
+                    st.write(f"### Repositories for {user_data['username']}")
+                    st.dataframe(df_repos[['name', 'language', 'stars', 'commits']])
+                    st.write("### Language Distribution")
+                    # Goes through the 'language' column and counts the occurrences of each language
+                    language_counts = df_repos['language'].value_counts()
+                    st.bar_chart(language_counts, horizontal=True)
+                else:
+                    st.write(f"No public repositories found for user {user_data['username']}.")
+
         except requests.exceptions.RequestException as e:
             st.error(f"An error occurred - User not found: {e}")
     
@@ -66,6 +76,12 @@ if st.session_state.get("show_users_button"):
             st.write("All Users in the Database:")
             df = pd.DataFrame(users_data)
             st.dataframe(df)
+
+            st.write("### Most Used Language Distribution Across All Users")
+            # Counts the occurrences of each language in the 'most_used_language' column and creates a bar chart
+            language_counts = df['most_used_language'].value_counts()
+            st.bar_chart(language_counts, horizontal=True)
+
     except requests.exceptions.RequestException as e:
             st.error(f"An error occurred while fetching users: {e}")
 
@@ -77,6 +93,12 @@ if st.session_state.get("show_repos_button"):
             df = pd.DataFrame(repos_data)
             st.write("All Repositories in the Database:")
             st.dataframe(df)
+
+            st.write("### Most Used Language Distribution Across All Repositories")
+            # Counts the occurrences of each language in the 'language' column of a repo
+            language_counts = df['language'].value_counts()
+            st.bar_chart(language_counts, horizontal=True)
+
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching repositories: {e}")
 
