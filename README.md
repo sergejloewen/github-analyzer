@@ -21,16 +21,18 @@ UML diagram to be added (WIP)
 - FastAPI
 - Pydantic
 - SQLAlchemy
-- PostgreSQL (WIP) / zunächst SQLite
+- PostgreSQL
 - pytest
 - Streamlit
-- Docker (WIP)
+- Docker
 - GitHub Actions (WIP)
 
 ## Setup
 
 Clone the repository, go into the folder and use the following command in terminal to set up
 the project environment using uv.
+
+(WIP) Change to accomodate Docker
 
 On Windows:
 
@@ -54,6 +56,5 @@ WIP
 
 ## Future Plans
 
-- Upgrading Database to PostgresSQL
-- Docker and Docker image for easy Setup
+- provide Docker image for easy Setup
 - GitHub Actions for automatic Build Testing
