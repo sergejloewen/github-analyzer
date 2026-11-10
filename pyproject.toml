@@ -1,0 +1,45 @@
+[project]
+name = "github-analyzer"
+version = "0.1.0"
+description = "Application to analyze GitHub repositories and users activity as an API and web dashboard."
+readme = "README.md"
+authors = [
+    { name = "Sergej Loewen", email = "loewensergej@yahoo.de" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "annotated-types==0.8.0",
+    "certifi==2026.7.22",
+    "charset-normalizer==3.5.2",
+    "colorama==0.4.6",
+    "fastapi[standard]>=0.162.2",
+    "idna==3.20",
+    "iniconfig==2.3.1",
+    "packaging==26.3",
+    "pluggy==1.7.0",
+    "pydantic==2.14.1",
+    "pydantic-core==2.50.1",
+    "pygments==2.21.0",
+    "pytest==9.1.1",
+    "pyyaml==6.0.3",
+    "requests==2.34.2",
+    "responses==0.26.3",
+    "sqlalchemy==2.1.4",
+    "streamlit>=1.67.0",
+    "typing-extensions==4.16.0",
+    "typing-inspection==0.4.4",
+    "urllib3==2.8.0",
+]
+
+[project.scripts]
+github-analyzer = "github_analyzer:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+package = false
+
+[tool.fastapi]
+entrypoint = "src.main:app"

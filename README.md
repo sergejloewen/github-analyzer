@@ -25,14 +25,13 @@ WIP
 
 ## Setup
 
-Set up the virtual python environment, download and install all the necessary packages from the requirements.txt.
+Clone the repository, go into the folder and use the following command in terminal to set up
+the project environment using uv.
 
 On Windows:
 
 ```text
-python -m venv .venv
-.venv\Scripts\activate
-python -m pip install -r requirements.txt
+uv run main.py
 ```
 
 ## Tests
