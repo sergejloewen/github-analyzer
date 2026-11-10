@@ -4,7 +4,7 @@ from sqlalchemy.orm import DeclarativeBase
 from typing import Optional
 from contextlib import contextmanager
 
-engine = create_engine('sqlite+pysqlite:///github_data.db', echo=True)
+engine = create_engine('sqlite+pysqlite:///github_data.db', echo=True, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine)
 
 # Define the base class for declarative models
@@ -37,9 +37,22 @@ class User(Base):
     most_used_language: Mapped [str]
 
 # Context manager to handle database sessions
-@contextmanager
+# Commented out as we go from the app being used in CLI to being used as an API, 
+# and the API will handle the database sessions differently.
+# @contextmanager
+# def get_db():
+#     with SessionLocal() as session:
+#         yield session
+
 def get_db():
-    with SessionLocal() as session:
-        yield session
+    """
+    Get a database session for interacting with the database.
+    This function is used as a dependency in FastAPI routes to provide a session for each request.
+    """
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 Base.metadata.create_all(bind=engine)
