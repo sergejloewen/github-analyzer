@@ -1,0 +1,39 @@
+name: GitHub Analyzer CI Pipeline
+
+# Pipeline starts every push or pull request to the main branch
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  quality-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Code checkout step to get the latest code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Provide uv for fast installation of Python and caching of dependencies
+    - name: Set up uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+        enable-cache: true
+
+    # Install Python using uv
+    - name: Set up Python
+      run: uv python install 3.12
+
+    # Run existing tests using uv to ensure that the code is working as expected
+    - name: Run existing tests
+      run: |
+        uv sync
+        uv run pytest
+
+    # Test Docker build to ensure that the Dockerfile is valid and can be built successfully
+    - name: Test Docker Build
+      run: |
+        docker compose build
