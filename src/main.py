@@ -21,6 +21,49 @@ def get_users(session: Session = Depends(db.get_db)):
     users = session.scalars(sa.select(db.User)).all()
     return users
 
+@app.get("/api/users/{username}", response_model=res.UserResponse)
+def get_user(username: str, session: Session = Depends(db.get_db)):
+    """
+    Get a specific user and their statistics + repositories from the database by username
+    """
+    # Fetch user ID from GitHub API to ensure the user exists 
+    # and gets the right user from the database, as the username is not unique in the database 
+    # but the user ID is.
+    user_id = pd.fetch_user_id(username)
+
+    # If the user ID is None, it means the user does not exist on GitHub, so we raise a 404 error.
+    if user_id is None:
+        raise HTTPException(status_code=404, detail=f"User '{username}' not found on GitHub.")
+
+    user = session.scalar(sa.select(db.User).where(db.User.id == user_id))
+
+    # If the user is not found in the database, raise a 404 error.
+    if user is None:
+        raise HTTPException(status_code=404, detail=f"User '{username}' not found in the database.")
+
+    return user
+
+@app.get("/api/repos", response_model=list[res.RepoResponse])
+def get_repos(session: Session = Depends(db.get_db)):
+    """
+    Get all repositories from the database
+    """
+    repos = session.scalars(sa.select(db.Repo)).all()
+    return repos
+
+@app.get("/api/repos/{repo_id}", response_model=res.RepoResponse)
+def get_repo(repo_id: int, session: Session = Depends(db.get_db)):
+    """
+    Get a specific repository from the database by its ID
+    """
+    repo = session.scalar(sa.select(db.Repo).where(db.Repo.id == repo_id))
+
+    # If the repository is not found in the database, raise a 404 error.
+    if repo is None:
+        raise HTTPException(status_code=404, detail=f"Repository with ID '{repo_id}' not found in the database.")
+
+    return repo
+
 @app.post("/api/analyze/{username}", response_model=res.UserResponse)
 def save_user(username: str, session: Session = Depends(db.get_db)):
     """
