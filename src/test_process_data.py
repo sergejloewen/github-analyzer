@@ -1,5 +1,5 @@
 import pytest
-from src import responses
+import responses
 import requests
 from src import process_data as pd
 from src import exceptions as ex
