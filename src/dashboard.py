@@ -1,9 +1,12 @@
 import streamlit as st
 import requests
 import pandas as pd
+import os
 
-repos_url = "http://127.0.0.1:8000/api/repos"
-users_url = "http://127.0.0.1:8000/api/users"
+API_BASE = os.getenv("API_URL", "http://127.0.0.1:8000")
+users_url = f"{API_BASE}/api/users"
+repos_url = f"{API_BASE}/api/repos"
+
 
 st.title("GitHub Analyzer Dashboard")
 
@@ -18,7 +21,7 @@ with col3:
 
 
 username = st.text_input("Enter GitHub username:", key="username_input")
-url = f"http://127.0.0.1:8000/api/analyze/{username}"
+url = f"{API_BASE}/api/analyze/{username}"
 
 col_left, col_right = st.columns([0.85, 0.15])
 

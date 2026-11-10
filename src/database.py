@@ -3,8 +3,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, sessionmaker
 from sqlalchemy.orm import DeclarativeBase
 from typing import Optional
 from contextlib import contextmanager
+import os
 
-engine = create_engine('sqlite+pysqlite:///github_data.db', echo=True, connect_args={"check_same_thread": False})
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", 
+    "postgresql+psycopg://postgres:meingeheimnis@db:5432/github_analyzer"
+)
+
+engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(bind=engine)
 
 # Define the base class for declarative models
