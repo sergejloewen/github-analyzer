@@ -3,11 +3,13 @@ import process_data as pd
 import database as db
 import interact_db as iDB
 from fastapi import FastAPI, Depends, HTTPException
-import responses as res
+from . import schemas as res
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
 
 app = FastAPI()
+
+#TODO add potentially more error handling for API endpoints and tests
 
 @app.get("/")
 def read_root():
@@ -55,6 +57,8 @@ def get_repos(session: Session = Depends(db.get_db)):
 def get_repo(repo_id: int, session: Session = Depends(db.get_db)):
     """
     Get a specific repository from the database by its ID
+    ID is unique for each repository, but name can be the same for different repositories
+    if it is owned by different users, so we use the ID to get the right repository.
     """
     repo = session.scalar(sa.select(db.Repo).where(db.Repo.id == repo_id))
 
