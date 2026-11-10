@@ -1,8 +1,8 @@
 import pytest
-import responses
+from src import responses
 import requests
-import process_data as pd
-import exceptions as ex
+from src import process_data as pd
+from src import exceptions as ex
 
 
 # test file inlcudes tests for process_data.py but also for exceptions.py

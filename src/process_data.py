@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 import requests
-import exceptions as ex
+from src import exceptions as ex
 
 # potentially add validation and testing for the models
 class GitHubUserRepo(BaseModel):

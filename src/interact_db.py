@@ -1,5 +1,5 @@
-import database as db
-from process_data import GitHubUserRepo, UserStats
+from src import database as db
+from src.process_data import GitHubUserRepo, UserStats
 import sqlalchemy as sa
 import sqlalchemy.orm as orm
 

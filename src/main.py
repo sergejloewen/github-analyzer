@@ -1,9 +1,9 @@
-import requests
-import process_data as pd
-import database as db
-import interact_db as iDB
+# import requests
+from src import process_data as pd
+from src import database as db
+from src import interact_db as iDB
 from fastapi import FastAPI, Depends, HTTPException
-import schemas as res
+from src import schemas as res
 from sqlalchemy.orm import Session
 import sqlalchemy as sa
 
