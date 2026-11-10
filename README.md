@@ -10,7 +10,7 @@ in a simple visual manner.
 
 ## Architecture
 
-The app is a 3-tier architecture consisting of the database (SQlite/SQLAlchemy as of right now),
+The app is a 3-tier architecture consisting of the PostgreSQL,
 FastAPI-Backend and an interactive Streamlit-Frontend.
 
 UML diagram to be added (WIP)
@@ -25,25 +25,51 @@ UML diagram to be added (WIP)
 - pytest
 - Streamlit
 - Docker
-- GitHub Actions (WIP)
+- GitHub Actions
 
 ## Setup
 
-Clone the repository, go into the folder and use the following command in terminal to set up
-the project environment using uv.
+The app is fully dockerized, so clone the repository, go into the folder and use the following command in the terminal to set it up.
+The only other requirement is having a running docker desktop.
 
-(WIP) Change to accomodate Docker
-
-On Windows:
+**Configure Environment Variables**
+Create a file named `.env` in the root directory and choose your access credentials for the PostgreSQL database:
 
 ```text
-uv run main.py
+POSTGRES_USER=choose_a_username
+POSTGRES_PASSWORD=choose_a_safe_password
+POSTGRES_DB=github_analyzer
+```
+
+*(Hint: The `.env`-file is added to `.gitignore` and therefore will not be uploaded to GitHub due to security reasons.)*
+
+**Start the App:**
+Boot up the entire multi-container-network (Database, API and Dashboard) with one command:
+
+```bash
+docker compose up --build
+```
+
+**Open in Browser:**
+Once all containers successfully booted up, you can access each service over the following URLs:
+
+- 📊 **Streamlit Web-Dashboard:** [http://localhost:8501](http://localhost:8501)
+- 🌐 **FastAPI API-Documentation (Swagger UI):** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### Stop the App
+
+To properly shutdown the whole container-network, press `Ctrl + C` in the terminal or use following command
+while being in the root directory:
+
+```bash
+docker compose down
 ```
 
 ## Tests
 
 Pytest is used for testing the app and in the test_process_data.py file there are all the tests written
 for both process_data.py and exceptions.py, as they are closely related.
+
 TODO: Write tests for the database operations, backend and frontend
 
 ## Screenshots/ GIFs
@@ -56,5 +82,5 @@ WIP
 
 ## Future Plans
 
-- provide Docker image for easy Setup
-- GitHub Actions for automatic Build Testing
+All planned features are implemented as of now. The development for now is finished.
+(potentially provide a pre-built docker image for the easiest setup)
