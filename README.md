@@ -67,10 +67,8 @@ docker compose down
 
 ## Tests
 
-Pytest is used for testing the app and in the test_process_data.py file there are all the tests written
-for both process_data.py and exceptions.py, as they are closely related.
-
-TODO: Write tests for the database operations, backend and frontend
+Pytest is used for testing the app and the tests folder contains all the test files.
+Unit tests and integration tests check the functionality of the processing logic, api endpoints and database interaction.
 
 ## Screenshots/ GIFs
 
