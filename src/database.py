@@ -4,6 +4,9 @@ from sqlalchemy.orm import DeclarativeBase
 from typing import Optional
 from contextlib import contextmanager
 import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
