@@ -1,3 +1,4 @@
+import re
 from pydantic import BaseModel, Field
 import requests
 from src import exceptions as ex
@@ -38,13 +39,13 @@ def get_user_input() -> str:
     # and within length limits (e.g., no special characters, not empty, etc.)
     return input("Enter a GitHub username: ")
 
-def safe_get(url: str) -> requests.Response:
+def safe_get(url: str, params: dict | None = None, headers: dict | None = None) -> requests.Response:
     """
     Perform a GET request to the specified URL and handle potential exceptions.
     """
 
     try:
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=5, params=params, headers=headers)
         response.raise_for_status()  # Raise an exception for HTTP errors
         return response
     except requests.exceptions.HTTPError as err:
@@ -119,9 +120,25 @@ def get_commit_count(username: str, repo_name: str) -> int:
     # username and repo_name are enough despite being not unique, 
     # as the combination of both is unique for each repository
     url = f"https://api.github.com/repos/{username}/{repo_name}/commits"
-    response = safe_get(url)
-    commits_data = response.json()
-    return len(commits_data)  # Return the number of commits
+
+    params = {"per_page": 1}  # Fetch only one commit to get the total count from the response headers
+    headers = {"Accept": "application/vnd.github+json"} # Set the Accept header to specify the GitHub API version and format
+
+    response = safe_get(url, params=params, headers=headers)
+
+    # If the response is empty, it means there are no commits
+    if not response.json():  
+        return 0
+
+    # The total number of commits is provided in the 'Link' header of the response
+    if 'Link' in response.headers:
+        link_header = response.headers['Link']
+        match = re.search(r'&page=(\d+)>; rel="last"', link_header)
+        if match:
+            return int(match.group(1))  # Return the total number of commits from the last page number
+
+    # Repo has exactly one commit, as the 'Link' header is not present in the response
+    return len(response.json())  
 
 def calculate_stats(user_repos: list[GitHubUserRepo], user_id: int, username: str) -> UserStats:
     """
