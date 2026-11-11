@@ -11,6 +11,24 @@ jobs:
   quality-check:
     runs-on: ubuntu-latest
 
+    # Starts a PostgreSQL service for testing purposes
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: github_analyzer_test
+        ports:
+          # Container port 5432 is mapped to the host port 5432 for PostgreSQL service
+          - 5432:5432
+        # Waiting for the PostgreSQL service to be ready before running tests
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
     # Code checkout step to get the latest code from the repository
     - name: Checkout code
@@ -29,11 +47,18 @@ jobs:
 
     # Run existing tests using uv to ensure that the code is working as expected
     - name: Run existing tests
+      env:
+        DATABASE_URL: postgresql+psycopg2://postgres:testpassword@localhost:5432/github_analyzer_test
+        TEST_DATABASE_URL: postgresql+psycopg2://postgres:testpassword@localhost:5432/github_analyzer_test
       run: |
         uv sync
         uv run pytest
 
     # Test Docker build to ensure that the Dockerfile is valid and can be built successfully
     - name: Test Docker Build
+      env:
+        POSTGRES_USER: ci_user
+        POSTGRES_PASSWORD: ci_password
+        POSTGRES_DB: ci_db
       run: |
         docker compose build
