@@ -80,6 +80,14 @@ def save_user(username: str, session: Session = Depends(db.get_db)):
     
     raw_data = pd.fetch_user_repos(username)
     user_repos = pd.analyze_repos(raw_data)
+    # Fetch the number of commits for each repository and update the user_repos list
+    for repo in user_repos:
+        try:
+            repo.commits = pd.get_commit_count(repo.owner_username, repo.name)
+        except Exception as e:
+            print(f"Error fetching commit count for {repo.name}: {e}")
+            repo.commits = 0
+
     stats = pd.calculate_stats(user_repos, user_id, username)
 
     # Save the user, their statistics and repositories to the database

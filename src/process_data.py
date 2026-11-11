@@ -107,7 +107,9 @@ def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
         if repo.owner_id is None:
             repo.owner_id = repo_data.get('owner', {}).get('id', None)
 
-        repo.commits = get_commit_count(repo.owner_username, repo.name)  # Fetch the number of commits for the repository
+        # Fetch the number of commits for the repository happens outside this function, 
+        # as it requires an additional API call for each repository, which can be time-consuming 
+        # and may hit rate limits.
 
         user_repos.append(repo) # think about using yield if necessary
 
@@ -130,12 +132,13 @@ def get_commit_count(username: str, repo_name: str) -> int:
     if not response.json():  
         return 0
 
+    link_header = next((v for k, v in response.headers.items() if k.lower() == 'link'), None)
+
     # The total number of commits is provided in the 'Link' header of the response
-    if 'Link' in response.headers:
-        link_header = response.headers['Link']
-        match = re.search(r'&page=(\d+)>; rel="last"', link_header)
+    if link_header:
+        match = re.search(r'page=(\d+)[^>]*>;\s*rel=["\']last["\']', link_header)
         if match:
-            return int(match.group(1))  # Return the total number of commits from the last page number
+            return int(match.group(1))
 
     # Repo has exactly one commit, as the 'Link' header is not present in the response
     return len(response.json())  
