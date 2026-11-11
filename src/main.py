@@ -87,5 +87,8 @@ def save_user(username: str, session: Session = Depends(db.get_db)):
 
     # Retrieve the saved user from the database to return as a response
     db_user = session.scalar(sa.select(db.User).where(db.User.id == user_id))
+    
+    if db_user is None:
+        raise HTTPException(status_code=404, detail=f"User with ID '{user_id}' not found in the database.")
 
     return db_user

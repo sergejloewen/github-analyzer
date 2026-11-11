@@ -5,6 +5,10 @@ class RepoResponse(BaseModel):
     """
     Response model for a GitHub repository.
     """
+    model_config = {
+            "from_attributes": True,  # Allow model to be created from ORM objects
+        }
+
     id: int
     owner_id: int
     name: str
@@ -17,6 +21,10 @@ class UserResponse(BaseModel):
     """
     Response model for a GitHub user.
     """
+    model_config = {
+        "from_attributes": True,  # Allow model to be created from ORM objects
+    }
+
     id: int
     username: str
     repos: list[RepoResponse]

@@ -7,7 +7,9 @@ import os
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
-    "postgresql+psycopg://postgres:meingeheimnis@db:5432/github_analyzer"
+    # this default value should ideally be hidden, but as this is a local development environment, 
+    # it is okay to have it here for now.
+    "postgresql+psycopg://postgres:meingeheimnis@localhost:5432/github_analyzer" 
 )
 
 engine = create_engine(DATABASE_URL, echo=True)
