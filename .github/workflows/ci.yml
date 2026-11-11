@@ -48,8 +48,8 @@ jobs:
     # Run existing tests using uv to ensure that the code is working as expected
     - name: Run existing tests
       env:
-        DATABASE_URL: postgresql+psycopg2://postgres:testpassword@localhost:5432/github_analyzer_test
-        TEST_DATABASE_URL: postgresql+psycopg2://postgres:testpassword@localhost:5432/github_analyzer_test
+        DATABASE_URL: postgresql+psycopg://postgres:testpassword@localhost:5432/github_analyzer_test
+        TEST_DATABASE_URL: postgresql+psycopg://postgres:testpassword@localhost:5432/github_analyzer_test
       run: |
         uv sync
         uv run pytest
