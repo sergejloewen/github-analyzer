@@ -3,6 +3,9 @@ import re
 from pydantic import BaseModel, Field
 import requests
 from src import exceptions as ex
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 # potentially add validation and testing for the models
 class GitHubUserRepo(BaseModel):
