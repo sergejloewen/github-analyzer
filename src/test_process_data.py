@@ -84,7 +84,7 @@ def filtered_user_repos():
             owner_id=1,
             owner_username="testuser",
             name="python-data-analyzer",
-            starsgazers=12,
+            stargazers_count=12,
             language="Python",
             commits=0,
             description="Ein tolles Projekt zur Datenanalyse",
@@ -94,7 +94,7 @@ def filtered_user_repos():
             owner_id=1,
             owner_username="testuser",
             name="my-portfolio-website",
-            stars=3,
+            stargazers_count=3,
             language="TypeScript",
             commits=0,
             description="",
@@ -104,7 +104,7 @@ def filtered_user_repos():
             owner_id=1,
             owner_username="testuser",
             name="smart-home-automation",
-            stars=3,
+            stargazers_count=3,
             language="Unknown",
             commits=0,
             description="",
@@ -250,6 +250,69 @@ def test_fetch_user_repos_network_error():
         pd.fetch_user_repos(username)
     assert exc_info.type == ex.GitHubNetworkError
 
+@responses.activate
+def test_get_commit_count_no_commits():
+    """
+    Test getting commit count for a repository with no commits.
+    Should return 0.
+    """
+
+    username = "octocat"
+    repo_name = "Hello-World"
+    url = f"https://api.github.com/repos/{username}/{repo_name}/commits"
+
+    # Mock the API response to simulate a repository with no commits
+    responses.add(responses.GET, url, status=200, json=[])
+
+    commit_count = pd.get_commit_count(username, repo_name)
+    assert commit_count == 0
+
+@responses.activate
+def test_get_commit_count_with_commits():
+    """
+    Test getting commit count for a repository with commits.
+    Should return the correct number of commits.
+    """
+
+    username = "octocat"
+    repo_name = "Hello-World"
+    url = f"https://api.github.com/repos/{username}/{repo_name}/commits?per_page=1"
+
+    # Mock the API response to simulate a repository with commits
+    responses.add(
+        responses.GET,
+        url,
+        status=200,
+        json=[{"sha": "abc123"}],  # Simulate one commit in the response
+        headers={'Link': '<https://api.github.com/repos/octocat/Hello-World/commits?page=2>; rel="next", <https://api.github.com/repos/octocat/Hello-World/commits?page=5>; rel="last"'}
+    )
+
+    commit_count = pd.get_commit_count(username, repo_name)
+    assert commit_count == 5  # The last page number indicates there are 5 commits
+
+@responses.activate
+def test_get_commit_count_with_one_commit():
+    """
+    Test getting commit count for a repository with exactly one commit.
+    Should return 1.
+    """
+
+    username = "octocat"
+    repo_name = "Hello-World"
+    url = f"https://api.github.com/repos/{username}/{repo_name}/commits"
+
+    # Mock the API response to simulate a repository with exactly one commit
+    responses.add(
+        responses.GET,
+        url,
+        status=200,
+        json=[{"sha": "abc123"}],  # Simulate one commit in the response
+        headers={}  # No 'Link' header indicates there is only one page of results
+    )
+
+    commit_count = pd.get_commit_count(username, repo_name)
+    assert commit_count == 1  # Should return 1 since there is exactly one commit
+
 def test_analyze_repos_with_empty_data():
     """
     Test analyzing repositories with empty raw data.
@@ -299,36 +362,34 @@ def test_calculate_stats_with_empty_repos():
     assert stats.average_stars_per_repo == 0.0
     assert stats.most_used_language is 'Unknown'
 
-def test_calculate_stats_with_valid_repos(raw_json_data, user_id_name):
+def test_calculate_stats_with_valid_repos(filtered_user_repos, user_id_name):
     """
     Test calculating statistics with a valid list of user repositories.
     Should return UserStats with correct calculated values.
     """
 
     user_id, username = user_id_name
-    user_repos = pd.analyze_repos(raw_json_data)
-    stats = pd.calculate_stats(user_repos, user_id, username)
+    stats = pd.calculate_stats(filtered_user_repos, user_id, username)
     
 
     assert isinstance(stats, pd.UserStats)
     assert stats.id == user_id
     assert stats.username == username
-    assert stats.total_repos == len(user_repos)
-    assert stats.total_stars == sum(repo.stars for repo in user_repos)
-    assert stats.total_commits == sum(repo.commits for repo in user_repos)
+    assert stats.total_repos == len(filtered_user_repos)
+    assert stats.total_stars == sum(repo.stars for repo in filtered_user_repos)
+    assert stats.total_commits == sum(repo.commits for repo in filtered_user_repos)
     assert stats.average_stars_per_repo == (stats.total_stars / stats.total_repos) if stats.total_repos > 0 else 0.0
-    assert stats.most_used_language in [repo.language for repo in user_repos if repo.language != 'Unknown']
+    assert stats.most_used_language in [repo.language for repo in filtered_user_repos if repo.language != 'Unknown']
 
-def test_visualize_repos_with_valid_data(raw_json_data, user_id_name):
+def test_visualize_repos_with_valid_data(filtered_user_repos, user_id_name):
     """
     Test visualizing repositories with valid user repositories.
     Should not raise any exceptions.
     """
 
     user_id, username = user_id_name
-    user_repos = pd.analyze_repos(raw_json_data)
-    stats = pd.calculate_stats(user_repos, user_id, username)
-    pd.visualize_repos(user_repos, stats)  # Should not raise any exceptions
+    stats = pd.calculate_stats(filtered_user_repos, user_id, username)
+    pd.visualize_repos(filtered_user_repos, stats)  # Should not raise any exceptions
 
     assert True  # If no exceptions are raised, the test passes
 

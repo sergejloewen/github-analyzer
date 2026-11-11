@@ -1,3 +1,4 @@
+import re
 from pydantic import BaseModel, Field
 import requests
 from src import exceptions as ex
@@ -38,13 +39,13 @@ def get_user_input() -> str:
     # and within length limits (e.g., no special characters, not empty, etc.)
     return input("Enter a GitHub username: ")
 
-def safe_get(url: str) -> requests.Response:
+def safe_get(url: str, params: dict | None = None, headers: dict | None = None) -> requests.Response:
     """
     Perform a GET request to the specified URL and handle potential exceptions.
     """
 
     try:
-        response = requests.get(url, timeout=5)
+        response = requests.get(url, timeout=5, params=params, headers=headers)
         response.raise_for_status()  # Raise an exception for HTTP errors
         return response
     except requests.exceptions.HTTPError as err:
@@ -106,9 +107,41 @@ def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
         if repo.owner_id is None:
             repo.owner_id = repo_data.get('owner', {}).get('id', None)
 
+        # Fetch the number of commits for the repository happens outside this function, 
+        # as it requires an additional API call for each repository, which can be time-consuming 
+        # and may hit rate limits.
+
         user_repos.append(repo) # think about using yield if necessary
 
     return user_repos
+
+def get_commit_count(username: str, repo_name: str) -> int:
+    """
+    Fetch the number of commits for a specific repository made by the user from the GitHub API
+    """
+    # username and repo_name are enough despite being not unique, 
+    # as the combination of both is unique for each repository
+    url = f"https://api.github.com/repos/{username}/{repo_name}/commits"
+
+    params = {"per_page": 1}  # Fetch only one commit to get the total count from the response headers
+    headers = {"Accept": "application/vnd.github+json"} # Set the Accept header to specify the GitHub API version and format
+
+    response = safe_get(url, params=params, headers=headers)
+
+    # If the response is empty, it means there are no commits
+    if not response.json():  
+        return 0
+
+    link_header = next((v for k, v in response.headers.items() if k.lower() == 'link'), None)
+
+    # The total number of commits is provided in the 'Link' header of the response
+    if link_header:
+        match = re.search(r'page=(\d+)[^>]*>;\s*rel=["\']last["\']', link_header)
+        if match:
+            return int(match.group(1))
+
+    # Repo has exactly one commit, as the 'Link' header is not present in the response
+    return len(response.json())  
 
 def calculate_stats(user_repos: list[GitHubUserRepo], user_id: int, username: str) -> UserStats:
     """
