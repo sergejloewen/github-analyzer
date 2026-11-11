@@ -44,6 +44,7 @@ def safe_get(url: str, params: dict | None = None, headers: dict | None = None) 
     """
     Perform a GET request to the specified URL and handle potential exceptions.
     """
+    headers = {"Accept": "application/vnd.github+json"}
 
     token = os.getenv("GITHUB_TOKEN")
     if token:
