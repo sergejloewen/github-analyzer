@@ -284,7 +284,7 @@ def test_get_commit_count_with_commits():
         url,
         status=200,
         json=[{"sha": "abc123"}],  # Simulate one commit in the response
-        headers={'Link': '<https://api.github.com/repos/octocat/Hello-World/commits?page=2>; rel="next", <https://api.github.com/repos/octocat/Hello-World/commits?page=5>; rel="last"'}
+        headers={'Link': '<https://api.github.com/repositories/1420634601/commits?per_page=1&page=2>; rel="next", <https://api.github.com/repositories/1420634601/commits?per_page=1&page=5>; rel="last"'}
     )
 
     commit_count = pd.get_commit_count(username, repo_name)

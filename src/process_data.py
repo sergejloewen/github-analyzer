@@ -1,3 +1,4 @@
+import os
 import re
 from pydantic import BaseModel, Field
 import requests
@@ -43,6 +44,10 @@ def safe_get(url: str, params: dict | None = None, headers: dict | None = None) 
     """
     Perform a GET request to the specified URL and handle potential exceptions.
     """
+
+    token = os.getenv("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
 
     try:
         response = requests.get(url, timeout=5, params=params, headers=headers)
@@ -132,13 +137,14 @@ def get_commit_count(username: str, repo_name: str) -> int:
     if not response.json():  
         return 0
 
-    link_header = next((v for k, v in response.headers.items() if k.lower() == 'link'), None)
-
-    # The total number of commits is provided in the 'Link' header of the response
-    if link_header:
-        match = re.search(r'page=(\d+)[^>]*>;\s*rel=["\']last["\']', link_header)
+    # Repo has more than 1 commit (Look for the 'Link' header)
+    if "Link" in response.headers:
+        link_header = response.headers["Link"]
+        # Use regex to find the page number attached to 'rel="last"'
+        match = re.search(r'page=(\d+)>;\s*rel="last"', link_header)
         if match:
             return int(match.group(1))
+                        
 
     # Repo has exactly one commit, as the 'Link' header is not present in the response
     return len(response.json())  
