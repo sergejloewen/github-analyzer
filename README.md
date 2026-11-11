@@ -29,8 +29,8 @@ UML diagram to be added (WIP)
 
 ## Setup
 
-The app is fully dockerized, so clone the repository, go into the folder and use the following command in the terminal to set it up.
-The only other requirement is having a running docker desktop.
+The app is fully dockerized, so clone the repository and follow the following steps
+The only requirement is having a running docker desktop.
 
 **Configure Environment Variables**
 Create a file named `.env` in the root directory and choose your access credentials for the PostgreSQL database:
@@ -78,7 +78,11 @@ WIP
 
 ## Known Limitations
 
-WIP
+- Currently when the backend interacts with the GitHub API it is affected by pagination and
+therefore only shows 30 results if there are more than 30 items (repos for instance),
+only exception is number of commits per repo as those are already changed to account for that
+- total_commits in for each users might be inflated in the case of repos being worked on by multiple people
+and the commits getting counted towards the repo owner
 
 ## Future Plans
 
