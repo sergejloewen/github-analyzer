@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables from .env file
 
-# potentially add validation and testing for the models
 class GitHubUserRepo(BaseModel):
     """
     Data model representing a GitHub repository with relevant fields.
@@ -19,7 +18,7 @@ class GitHubUserRepo(BaseModel):
     name: str
     stars: int = Field(alias='stargazers_count')
     language: str | None = 'Unknown'
-    commits: int | None = 0     # currently not working
+    commits: int | None = 0
     description: str | None = None
 
 class UserStats(BaseModel):
@@ -39,8 +38,7 @@ def get_user_input() -> str:
     """
     Prompt the user to enter a GitHub username.
     """
-    #TODO: Add input validation to ensure the username is valid 
-    # and within length limits (e.g., no special characters, not empty, etc.)
+    #input validation not needed as function isn't used anymore
     return input("Enter a GitHub username: ")
 
 def safe_get(url: str, params: dict | None = None, headers: dict | None = None) -> requests.Response:
@@ -71,8 +69,6 @@ def fetch_user_repos(username: str) -> list[dict]:
     """
     Fetch the user's repositories from the GitHub API
     """
-    #TODO fetch the number of commits for each repository made by the user, 
-    # might require changing another method as the data might be already in the raw_data, but is not being used and calculated in the GitHubUserRepo Class
 
     url = f"https://api.github.com/users/{username}/repos"
     response = safe_get(url)
@@ -199,6 +195,7 @@ def calculate_stats(user_repos: list[GitHubUserRepo], user_id: int, username: st
         most_used_language=most_used_language
     )
 
+# Not being used anymore as the visualization is now being done in the web dashboard
 def visualize_repos(user_repos: list[GitHubUserRepo], stats: UserStats) -> None:
     """
     Visualize the user's repositories and statistics in a simple table format in CLI
