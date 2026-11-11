@@ -80,10 +80,11 @@ if st.session_state.get("show_users_button"):
             df = pd.DataFrame(users_data)
             st.dataframe(df)
 
-            st.write("### Most Used Language Distribution Across All Users")
-            # Counts the occurrences of each language in the 'most_used_language' column and creates a bar chart
-            language_counts = df['most_used_language'].value_counts()
-            st.bar_chart(language_counts, horizontal=True)
+            if not df.empty:
+                st.write("### Most Used Language Distribution Across All Users")
+                # Counts the occurrences of each language in the 'most_used_language' column and creates a bar chart
+                language_counts = df['most_used_language'].value_counts()
+                st.bar_chart(language_counts, horizontal=True)
 
     except requests.exceptions.RequestException as e:
             st.error(f"An error occurred while fetching users: {e}")
@@ -97,10 +98,11 @@ if st.session_state.get("show_repos_button"):
             st.write("All Repositories in the Database:")
             st.dataframe(df)
 
-            st.write("### Most Used Language Distribution Across All Repositories")
-            # Counts the occurrences of each language in the 'language' column of a repo
-            language_counts = df['language'].value_counts()
-            st.bar_chart(language_counts, horizontal=True)
+            if not df.empty:
+                st.write("### Most Used Language Distribution Across All Repositories")
+                # Counts the occurrences of each language in the 'language' column of a repo
+                language_counts = df['language'].value_counts()
+                st.bar_chart(language_counts, horizontal=True)
 
     except requests.exceptions.RequestException as e:
         st.error(f"An error occurred while fetching repositories: {e}")
