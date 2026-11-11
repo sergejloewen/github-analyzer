@@ -8,8 +8,6 @@ import sqlalchemy as sa
 
 app = FastAPI()
 
-#TODO add potentially more error handling for API endpoints and tests
-
 # Not needed endpoint, can be used for testing if the API is running at all
 @app.get("/")
 def read_root():
