@@ -106,9 +106,22 @@ def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
         if repo.owner_id is None:
             repo.owner_id = repo_data.get('owner', {}).get('id', None)
 
+        repo.commits = get_commit_count(repo.owner_username, repo.name)  # Fetch the number of commits for the repository
+
         user_repos.append(repo) # think about using yield if necessary
 
     return user_repos
+
+def get_commit_count(username: str, repo_name: str) -> int:
+    """
+    Fetch the number of commits for a specific repository made by the user from the GitHub API
+    """
+    # username and repo_name are enough despite being not unique, 
+    # as the combination of both is unique for each repository
+    url = f"https://api.github.com/repos/{username}/{repo_name}/commits"
+    response = safe_get(url)
+    commits_data = response.json()
+    return len(commits_data)  # Return the number of commits
 
 def calculate_stats(user_repos: list[GitHubUserRepo], user_id: int, username: str) -> UserStats:
     """
