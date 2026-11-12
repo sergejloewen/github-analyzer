@@ -1,5 +1,6 @@
 # Github Analyzer
 
+[![GitHub Analyzer CI Pipeline](https://github.com/sergejloewen/github-analyzer/actions/workflows/ci.yml/badge.svg)](https://github.com/sergejloewen/github-analyzer/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)](#)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009485.svg?logo=fastapi&logoColor=white)](#)
 [![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?logo=streamlit&logoColor=fff)](#)
