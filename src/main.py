@@ -21,6 +21,13 @@ def get_users(session: Session = Depends(db.get_db)):
     users = session.scalars(sa.select(db.User)).all()
     return users
 
+# Not getting used at the moment, might need to be changed to use user id or
+# the fetch_user_id function needs to be removed/replaced with a different function 
+# that fetches the user id from the database instead of the GitHub API.
+# As otherwise testing this endpoint will be difficult as the user id is not known beforehand 
+# and the fetch_user_id function will return None if the user does not exist on GitHub.
+# Other Idea: Mock the fetch_user_id function in the the test to return a fake user id for testing purposes, 
+# but that might not be the best approach as it will not test the actual full functionality of the endpoint.
 @app.get("/api/users/{username}", response_model=res.UserResponse)
 def get_user(username: str, session: Session = Depends(db.get_db)):
     """
@@ -51,6 +58,7 @@ def get_repos(session: Session = Depends(db.get_db)):
     repos = session.scalars(sa.select(db.Repo)).all()
     return repos
 
+# Not getting used at the moment
 @app.get("/api/repos/{repo_id}", response_model=res.RepoResponse)
 def get_repo(repo_id: int, session: Session = Depends(db.get_db)):
     """
@@ -66,6 +74,9 @@ def get_repo(repo_id: int, session: Session = Depends(db.get_db)):
 
     return repo
 
+# Same thing as the get_user endpoint, might need to be changed to use user id or
+# the fetch_user_id function needs to be removed/replaced with a different function
+# But using username is more user friendly and easier to use for the user, so we will keep it for now.
 @app.post("/api/analyze/{username}", response_model=res.UserResponse)
 def save_user(username: str, session: Session = Depends(db.get_db)):
     """

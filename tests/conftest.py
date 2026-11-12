@@ -92,9 +92,38 @@ def sample_users():
         GitHubUserRepo(id=201, owner_id=2, name="repoA", language="Java", stargazers_count=3, commits=1, description="Test repo A")
     ]
 
+    user3_stats = UserStats(
+        id=3,
+        username="testuser3",
+        total_repos=0,
+        total_stars=0,
+        total_commits=0,
+        average_stars_per_repo=0.0,
+        most_used_language=""
+    )
+    user3_repos = []
+
+    user4_stats = UserStats(
+        id=4,
+        username="testuser4",
+        total_repos=4,
+        total_stars=20,
+        total_commits=12,
+        average_stars_per_repo=5.0,
+        most_used_language="Python"
+    )
+    user4_repos = [
+        GitHubUserRepo(id=401, owner_id=4, name="repoD", language="Python", stargazers_count=5, commits=3, description="Test repo D"),
+        GitHubUserRepo(id=402, owner_id=4, name="repoE", language="Python", stargazers_count=5, commits=3, description="Test repo E"),
+        GitHubUserRepo(id=403, owner_id=4, name="repoF", language="Python", stargazers_count=5, commits=3, description="Test repo F"),
+        GitHubUserRepo(id=404, owner_id=4, name="repoG", language="Python", stargazers_count=5, commits=3, description="Test repo G")
+    ]
+
     return [
         (user1_stats, user1_repos),
-        (user2_stats, user2_repos)
+        (user2_stats, user2_repos),
+        (user3_stats, user3_repos),
+        (user4_stats, user4_repos)
     ]
 
 @pytest.fixture
@@ -130,4 +159,31 @@ def sample_user_responses():
         most_used_language="Java"
     )
 
-    return [user1_response, user2_response]
+    user3_response = UserResponse(
+        id=3,
+        username="testuser3",
+        repos=[],
+        total_repos=0,
+        total_stars=0,
+        total_commits=0,
+        average_stars_per_repo=0.0,
+        most_used_language=""
+    )
+
+    user4_response = UserResponse(
+        id=4,
+        username="testuser4",
+        repos=[
+            RepoResponse(id=401, owner_id=4, name="repoD", language="Python", stars=5, commits=3, description="Test repo D"),
+            RepoResponse(id=402, owner_id=4, name="repoE", language="Python", stars=5, commits=3, description="Test repo E"),
+            RepoResponse(id=403, owner_id=4, name="repoF", language="Python", stars=5, commits=3, description="Test repo F"),
+            RepoResponse(id=404, owner_id=4, name="repoG", language="Python", stars=5, commits=3, description="Test repo G")
+        ],
+        total_repos=4,
+        total_stars=20,
+        total_commits=12,
+        average_stars_per_repo=5.0,
+        most_used_language="Python"
+    )
+
+    return [user1_response, user2_response, user3_response, user4_response]
