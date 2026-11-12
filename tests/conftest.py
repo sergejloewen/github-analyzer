@@ -70,13 +70,12 @@ def sample_users():
         username="testuser1",
         total_repos=2,
         total_stars=10,
-        total_commits=5,
         average_stars_per_repo=5.0,
         most_used_language="Python"
     )
     user1_repos = [
-        GitHubUserRepo(id=101, owner_id=1, name="repo1", language="Python", stargazers_count=5, commits=3, description="Test repo 1"),
-        GitHubUserRepo(id=102, owner_id=1, name="repo2", language="JavaScript", stargazers_count=5, commits=2, description="Test repo 2")
+        GitHubUserRepo(id=101, owner_id=1, name="repo1", language="Python", stargazers_count=5, description="Test repo 1"),
+        GitHubUserRepo(id=102, owner_id=1, name="repo2", language="JavaScript", stargazers_count=5, description="Test repo 2")
     ]
 
     user2_stats = UserStats(
@@ -84,12 +83,11 @@ def sample_users():
         username="testuser2",
         total_repos=1,
         total_stars=3,
-        total_commits=1,
         average_stars_per_repo=3.0,
         most_used_language="Java"
     )
     user2_repos = [
-        GitHubUserRepo(id=201, owner_id=2, name="repoA", language="Java", stargazers_count=3, commits=1, description="Test repo A")
+        GitHubUserRepo(id=201, owner_id=2, name="repoA", language="Java", stargazers_count=3, description="Test repo A")
     ]
 
     user3_stats = UserStats(
@@ -97,7 +95,6 @@ def sample_users():
         username="testuser3",
         total_repos=0,
         total_stars=0,
-        total_commits=0,
         average_stars_per_repo=0.0,
         most_used_language=""
     )
@@ -108,15 +105,14 @@ def sample_users():
         username="testuser4",
         total_repos=4,
         total_stars=20,
-        total_commits=12,
         average_stars_per_repo=5.0,
         most_used_language="Python"
     )
     user4_repos = [
-        GitHubUserRepo(id=401, owner_id=4, name="repoD", language="Python", stargazers_count=5, commits=3, description="Test repo D"),
-        GitHubUserRepo(id=402, owner_id=4, name="repoE", language="Python", stargazers_count=5, commits=3, description="Test repo E"),
-        GitHubUserRepo(id=403, owner_id=4, name="repoF", language="Python", stargazers_count=5, commits=3, description="Test repo F"),
-        GitHubUserRepo(id=404, owner_id=4, name="repoG", language="Python", stargazers_count=5, commits=3, description="Test repo G")
+        GitHubUserRepo(id=401, owner_id=4, name="repoD", language="Python", stargazers_count=5, description="Test repo D"),
+        GitHubUserRepo(id=402, owner_id=4, name="repoE", language="Python", stargazers_count=5, description="Test repo E"),
+        GitHubUserRepo(id=403, owner_id=4, name="repoF", language="Python", stargazers_count=5, description="Test repo F"),
+        GitHubUserRepo(id=404, owner_id=4, name="repoG", language="Python", stargazers_count=5, description="Test repo G")
     ]
 
     return [
@@ -136,12 +132,11 @@ def sample_user_responses():
         id=1,
         username="testuser1",
         repos=[
-            RepoResponse(id=101, owner_id=1, name="repo1", language="Python", stars=5, commits=3, description="Test repo 1"),
-            RepoResponse(id=102, owner_id=1, name="repo2", language="JavaScript", stars=5, commits=2, description="Test repo 2")
+            RepoResponse(id=101, owner_id=1, name="repo1", language="Python", stars=5, description="Test repo 1"),
+            RepoResponse(id=102, owner_id=1, name="repo2", language="JavaScript", stars=5, description="Test repo 2")
         ],
         total_repos=2,
         total_stars=10,
-        total_commits=5,
         average_stars_per_repo=5.0,
         most_used_language="Python"
     )
@@ -150,11 +145,10 @@ def sample_user_responses():
         id=2,
         username="testuser2",
         repos=[
-            RepoResponse(id=201, owner_id=2, name="repoA", language="Java", stars=3, commits=1, description="Test repo A")
+            RepoResponse(id=201, owner_id=2, name="repoA", language="Java", stars=3, description="Test repo A")
         ],
         total_repos=1,
         total_stars=3,
-        total_commits=1,
         average_stars_per_repo=3.0,
         most_used_language="Java"
     )
@@ -165,7 +159,6 @@ def sample_user_responses():
         repos=[],
         total_repos=0,
         total_stars=0,
-        total_commits=0,
         average_stars_per_repo=0.0,
         most_used_language=""
     )
@@ -174,14 +167,13 @@ def sample_user_responses():
         id=4,
         username="testuser4",
         repos=[
-            RepoResponse(id=401, owner_id=4, name="repoD", language="Python", stars=5, commits=3, description="Test repo D"),
-            RepoResponse(id=402, owner_id=4, name="repoE", language="Python", stars=5, commits=3, description="Test repo E"),
-            RepoResponse(id=403, owner_id=4, name="repoF", language="Python", stars=5, commits=3, description="Test repo F"),
-            RepoResponse(id=404, owner_id=4, name="repoG", language="Python", stars=5, commits=3, description="Test repo G")
+            RepoResponse(id=401, owner_id=4, name="repoD", language="Python", stars=5, description="Test repo D"),
+            RepoResponse(id=402, owner_id=4, name="repoE", language="Python", stars=5, description="Test repo E"),
+            RepoResponse(id=403, owner_id=4, name="repoF", language="Python", stars=5, description="Test repo F"),
+            RepoResponse(id=404, owner_id=4, name="repoG", language="Python", stars=5, description="Test repo G")
         ],
         total_repos=4,
         total_stars=20,
-        total_commits=12,
         average_stars_per_repo=5.0,
         most_used_language="Python"
     )

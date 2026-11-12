@@ -20,7 +20,6 @@ def save_user_profile(session: orm.Session, user_stats: UserStats, git_user_repo
             existing_user.repos = db_repos # update the repos relationship with the new list of repos
             existing_user.total_repos = user_stats.total_repos
             existing_user.total_stars = user_stats.total_stars
-            existing_user.total_commits = user_stats.total_commits
             existing_user.average_stars_per_repo = user_stats.average_stars_per_repo
             existing_user.most_used_language = user_stats.most_used_language
         else:
@@ -31,7 +30,6 @@ def save_user_profile(session: orm.Session, user_stats: UserStats, git_user_repo
                 repos=db_repos,
                 total_repos=user_stats.total_repos,
                 total_stars=user_stats.total_stars,
-                total_commits=user_stats.total_commits,
                 average_stars_per_repo=user_stats.average_stars_per_repo,
                 most_used_language=user_stats.most_used_language
             )
@@ -60,7 +58,6 @@ def transform_repos_to_db_format(user_repos: list[GitHubUserRepo]) -> list[db.Re
             name=repo.name,
             language=repo.language,
             stars=repo.stars,
-            commits=repo.commits,
             description=repo.description
         )
         db_repos.append(db_repo)

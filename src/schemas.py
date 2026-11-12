@@ -14,7 +14,6 @@ class RepoResponse(BaseModel):
     name: str
     language: Optional[str] = None
     stars: int
-    commits: int
     description: Optional[str] = None
 
 class UserResponse(BaseModel):
@@ -30,6 +29,5 @@ class UserResponse(BaseModel):
     repos: list[RepoResponse]
     total_repos: int
     total_stars: int
-    total_commits: int
     average_stars_per_repo: float
     most_used_language: Optional[str] = None
