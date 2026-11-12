@@ -86,7 +86,6 @@ def filtered_user_repos():
             name="python-data-analyzer",
             stargazers_count=12,
             language="Python",
-            commits=0,
             description="Ein tolles Projekt zur Datenanalyse",
         ),
         pd.GitHubUserRepo(
@@ -96,7 +95,6 @@ def filtered_user_repos():
             name="my-portfolio-website",
             stargazers_count=3,
             language="TypeScript",
-            commits=0,
             description="",
         ),
         pd.GitHubUserRepo(
@@ -106,7 +104,6 @@ def filtered_user_repos():
             name="smart-home-automation",
             stargazers_count=3,
             language="Unknown",
-            commits=0,
             description="",
         )
     ]
@@ -250,69 +247,6 @@ def test_fetch_user_repos_network_error():
         pd.fetch_user_repos(username)
     assert exc_info.type == ex.GitHubNetworkError
 
-@responses.activate
-def test_get_commit_count_no_commits():
-    """
-    Test getting commit count for a repository with no commits.
-    Should return 0.
-    """
-
-    username = "octocat"
-    repo_name = "Hello-World"
-    url = f"https://api.github.com/repos/{username}/{repo_name}/commits"
-
-    # Mock the API response to simulate a repository with no commits
-    responses.add(responses.GET, url, status=200, json=[])
-
-    commit_count = pd.get_commit_count(username, repo_name)
-    assert commit_count == 0
-
-@responses.activate
-def test_get_commit_count_with_commits():
-    """
-    Test getting commit count for a repository with commits.
-    Should return the correct number of commits.
-    """
-
-    username = "octocat"
-    repo_name = "Hello-World"
-    url = f"https://api.github.com/repos/{username}/{repo_name}/commits?per_page=1"
-
-    # Mock the API response to simulate a repository with commits
-    responses.add(
-        responses.GET,
-        url,
-        status=200,
-        json=[{"sha": "abc123"}],  # Simulate one commit in the response
-        headers={'Link': '<https://api.github.com/repositories/1420634601/commits?per_page=1&page=2>; rel="next", <https://api.github.com/repositories/1420634601/commits?per_page=1&page=5>; rel="last"'}
-    )
-
-    commit_count = pd.get_commit_count(username, repo_name)
-    assert commit_count == 5  # The last page number indicates there are 5 commits
-
-@responses.activate
-def test_get_commit_count_with_one_commit():
-    """
-    Test getting commit count for a repository with exactly one commit.
-    Should return 1.
-    """
-
-    username = "octocat"
-    repo_name = "Hello-World"
-    url = f"https://api.github.com/repos/{username}/{repo_name}/commits"
-
-    # Mock the API response to simulate a repository with exactly one commit
-    responses.add(
-        responses.GET,
-        url,
-        status=200,
-        json=[{"sha": "abc123"}],  # Simulate one commit in the response
-        headers={}  # No 'Link' header indicates there is only one page of results
-    )
-
-    commit_count = pd.get_commit_count(username, repo_name)
-    assert commit_count == 1  # Should return 1 since there is exactly one commit
-
 def test_analyze_repos_with_empty_data():
     """
     Test analyzing repositories with empty raw data.
@@ -358,7 +292,6 @@ def test_calculate_stats_with_empty_repos():
     assert stats.username == None
     assert stats.total_repos == 0
     assert stats.total_stars == 0
-    assert stats.total_commits == 0
     assert stats.average_stars_per_repo == 0.0
     assert stats.most_used_language is 'Unknown'
 
@@ -377,7 +310,6 @@ def test_calculate_stats_with_valid_repos(filtered_user_repos, user_id_name):
     assert stats.username == username
     assert stats.total_repos == len(filtered_user_repos)
     assert stats.total_stars == sum(repo.stars for repo in filtered_user_repos)
-    assert stats.total_commits == sum(repo.commits for repo in filtered_user_repos)
     assert stats.average_stars_per_repo == (stats.total_stars / stats.total_repos) if stats.total_repos > 0 else 0.0
     assert stats.most_used_language in [repo.language for repo in filtered_user_repos if repo.language != 'Unknown']
 

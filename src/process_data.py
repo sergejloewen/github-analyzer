@@ -18,7 +18,6 @@ class GitHubUserRepo(BaseModel):
     name: str
     stars: int = Field(alias='stargazers_count')
     language: str | None = 'Unknown'
-    commits: int | None = 0
     description: str | None = None
 
 class UserStats(BaseModel):
@@ -30,7 +29,6 @@ class UserStats(BaseModel):
     username: str | None = None
     total_repos: int
     total_stars: int
-    total_commits: int
     average_stars_per_repo: float
     most_used_language: str | None = None
 
@@ -112,42 +110,9 @@ def analyze_repos(raw_data: list[dict]) -> list[GitHubUserRepo]:
         if repo.owner_id is None:
             repo.owner_id = repo_data.get('owner', {}).get('id', None)
 
-        # Fetch the number of commits for the repository happens outside this function, 
-        # as it requires an additional API call for each repository, which can be time-consuming 
-        # and may hit rate limits.
-
         user_repos.append(repo) # think about using yield if necessary
 
     return user_repos
-
-def get_commit_count(username: str, repo_name: str) -> int:
-    """
-    Fetch the number of commits for a specific repository made by the user from the GitHub API
-    """
-    # username and repo_name are enough despite being not unique, 
-    # as the combination of both is unique for each repository
-    url = f"https://api.github.com/repos/{username}/{repo_name}/commits"
-
-    params = {"per_page": 1}  # Fetch only one commit to get the total count from the response headers
-    headers = {"Accept": "application/vnd.github+json"} # Set the Accept header to specify the GitHub API version and format
-
-    response = safe_get(url, params=params, headers=headers)
-
-    # If the response is empty, it means there are no commits
-    if not response.json():  
-        return 0
-
-    # Repo has more than 1 commit (Look for the 'Link' header)
-    if "Link" in response.headers:
-        link_header = response.headers["Link"]
-        # Use regex to find the page number attached to 'rel="last"'
-        match = re.search(r'page=(\d+)>;\s*rel="last"', link_header)
-        if match:
-            return int(match.group(1))
-                        
-
-    # Repo has exactly one commit, as the 'Link' header is not present in the response
-    return len(response.json())  
 
 def calculate_stats(user_repos: list[GitHubUserRepo], user_id: int, username: str) -> UserStats:
     """
@@ -158,7 +123,6 @@ def calculate_stats(user_repos: list[GitHubUserRepo], user_id: int, username: st
     username = username
     total_repos = len(user_repos)
     total_stars = sum(repo.stars for repo in user_repos)
-    total_commits = sum(repo.commits for repo in user_repos)
     total_languages = {}
 
     # calculate average stars per repo, handle division by zero
@@ -190,7 +154,6 @@ def calculate_stats(user_repos: list[GitHubUserRepo], user_id: int, username: st
         username=username,
         total_repos=total_repos,
         total_stars=total_stars,
-        total_commits=total_commits,
         average_stars_per_repo=average_stars_per_repo,
         most_used_language=most_used_language
     )
@@ -207,14 +170,13 @@ def visualize_repos(user_repos: list[GitHubUserRepo], stats: UserStats) -> None:
         return
     
     # Print the table for user repositories and their statistics
-    print(f"\n{'Repository':<30} {'Commits':<10} {'Stars':<10} {'Language':<15}")
+    print(f"\n{'Repository':<30} {'Stars':<10} {'Language':<15}")
     print("-" * 70)
     for repo in user_repos:
-        print(f"{repo.name:<30} {repo.commits:<10} {repo.stars:<10} {repo.language:<15}")
+        print(f"{repo.name:<30} {repo.stars:<10} {repo.language:<15}")
 
     print("\nStatistics:")
     print(f"Total Repositories: {stats.total_repos}")
     print(f"Total Stars: {stats.total_stars}")
-    print(f"Total Commits: {stats.total_commits}")
     print(f"Average Stars per Repository: {stats.average_stars_per_repo:.2f}")
     print(f"Most Used Language: {stats.most_used_language}")

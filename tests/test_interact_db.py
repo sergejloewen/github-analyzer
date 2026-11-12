@@ -20,7 +20,6 @@ def test_transform_repos_to_db_format(sample_users):
             assert db_repo.name == user_repo.name
             assert db_repo.language == user_repo.language
             assert db_repo.stars == user_repo.stars
-            assert db_repo.commits == user_repo.commits
             assert db_repo.description == user_repo.description
     assert isinstance(db_repos[0], db.Repo)  # Check if the first transformed repo is an instance of db.Repo
 
@@ -36,7 +35,6 @@ def test_save_new_user_profile(db_session, sample_users):
     assert saved_user.username == sample_users[0][0].username
     assert saved_user.total_repos == sample_users[0][0].total_repos
     assert saved_user.total_stars == sample_users[0][0].total_stars
-    assert saved_user.total_commits == sample_users[0][0].total_commits
     assert saved_user.average_stars_per_repo == sample_users[0][0].average_stars_per_repo
     assert saved_user.most_used_language == sample_users[0][0].most_used_language
 
@@ -55,12 +53,11 @@ def test_update_existing_user_profile(db_session, sample_users):
         username="updateduser",
         total_repos=3,
         total_stars=15,
-        total_commits=10,
         average_stars_per_repo=5.0,
         most_used_language="JavaScript"
     )
     updated_user_repos = [
-        GitHubUserRepo(id=103, owner_id=sample_users[0][0].id, name="repo3", language="JavaScript", stargazers_count=5, commits=4, description="Updated repo 3")
+        GitHubUserRepo(id=103, owner_id=sample_users[0][0].id, name="repo3", language="JavaScript", stargazers_count=5, description="Updated repo 3")
     ]
 
     # Update the existing user profile
@@ -72,7 +69,6 @@ def test_update_existing_user_profile(db_session, sample_users):
     assert saved_user.username == updated_user_stats.username
     assert saved_user.total_repos == updated_user_stats.total_repos
     assert saved_user.total_stars == updated_user_stats.total_stars
-    assert saved_user.total_commits == updated_user_stats.total_commits
     assert saved_user.average_stars_per_repo == updated_user_stats.average_stars_per_repo
     assert saved_user.most_used_language == updated_user_stats.most_used_language
     assert len(saved_user.repos) == len(updated_user_repos)  # Ensure the number of repos is updated correctly

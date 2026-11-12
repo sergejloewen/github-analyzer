@@ -32,7 +32,6 @@ def test_get_user_no_repos(client, db_session, sample_users, sample_user_respons
         username=user_stats.username,
         total_repos=user_stats.total_repos,
         total_stars=user_stats.total_stars,
-        total_commits=user_stats.total_commits,
         average_stars_per_repo=user_stats.average_stars_per_repo,
         most_used_language=user_stats.most_used_language
     )
@@ -47,7 +46,6 @@ def test_get_user_no_repos(client, db_session, sample_users, sample_user_respons
     assert response.json()[0]["username"] == sample_user_responses[2].username
     assert response.json()[0]["total_repos"] == sample_user_responses[2].total_repos
     assert response.json()[0]["total_stars"] == sample_user_responses[2].total_stars
-    assert response.json()[0]["total_commits"] == sample_user_responses[2].total_commits
     assert response.json()[0]["average_stars_per_repo"] == sample_user_responses[2].average_stars_per_repo
     assert response.json()[0]["most_used_language"] == sample_user_responses[2].most_used_language
     assert response.json()[0]["repos"] == []  # Ensure the repos list is empty
@@ -64,7 +62,6 @@ def test_get_users_with_data(client, db_session, sample_users, sample_user_respo
             username=user_stats.username,
             total_repos=user_stats.total_repos,
             total_stars=user_stats.total_stars,
-            total_commits=user_stats.total_commits,
             average_stars_per_repo=user_stats.average_stars_per_repo,
             most_used_language=user_stats.most_used_language
         )
@@ -79,7 +76,6 @@ def test_get_users_with_data(client, db_session, sample_users, sample_user_respo
                 name=repo.name,
                 language=repo.language,
                 stars=repo.stars,
-                commits=repo.commits,
                 description=repo.description
             )
             db_session.add(db_repo)
@@ -115,7 +111,6 @@ def test_get_repos_with_data(client, db_session, sample_users, sample_user_respo
             username=user_stats.username,
             total_repos=user_stats.total_repos,
             total_stars=user_stats.total_stars,
-            total_commits=user_stats.total_commits,
             average_stars_per_repo=user_stats.average_stars_per_repo,
             most_used_language=user_stats.most_used_language
         )
@@ -130,7 +125,6 @@ def test_get_repos_with_data(client, db_session, sample_users, sample_user_respo
                 name=repo.name,
                 language=repo.language,
                 stars=repo.stars,
-                commits=repo.commits,
                 description=repo.description
             )
             db_session.add(db_repo)
@@ -163,13 +157,13 @@ def test_get_specific_repo_success(client, db_session):
     This test checks if the endpoint returns a successful response with the expected repository data.
     """
     # Create a test user and repository in the database
-    test_user = db.User(username="testuser", total_repos=1, total_stars=10, total_commits=5,
+    test_user = db.User(username="testuser", total_repos=1, total_stars=10,
                         average_stars_per_repo=10.0, most_used_language="Python")
     db_session.add(test_user)
     db_session.flush()
 
     test_repo = db.Repo(owner_id=test_user.id, name="testrepo", language="Python",
-                        stars=10, commits=5, description="Test repository")
+                        stars=10, description="Test repository")
     db_session.add(test_repo)
     db_session.commit()
 
@@ -183,7 +177,6 @@ def test_get_specific_repo_success(client, db_session):
         "name": "testrepo",
         "language": "Python",
         "stars": 10,
-        "commits": 5,
         "description": "Test repository"
     }
 

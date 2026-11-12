@@ -42,7 +42,6 @@ if st.session_state.get("analyze_button"):
                                          'username': user_data['username'],
                                          'Total Repos': user_data['total_repos'],
                                          'Total Stars': user_data['total_stars'],
-                                         'Total Commits': user_data['total_commits'],
                                          'Average Stars per Repo': user_data['average_stars_per_repo'],
                                          'Most Used Language': user_data['most_used_language']}])
                 st.dataframe(df_user)
@@ -51,7 +50,7 @@ if st.session_state.get("analyze_button"):
                 df_repos = pd.DataFrame(user_data['repos'])
                 if not df_repos.empty:
                     st.write(f"### Repositories for {user_data['username']}")
-                    st.dataframe(df_repos[['name', 'language', 'stars', 'commits']])
+                    st.dataframe(df_repos[['name', 'language', 'stars']])
                     st.write("### Language Distribution")
                     # Goes through the 'language' column and counts the occurrences of each language
                     language_counts = df_repos['language'].value_counts()
