@@ -66,11 +66,32 @@ def safe_get(url: str, params: dict | None = None, headers: dict | None = None) 
 def fetch_user_repos(username: str) -> list[dict]:
     """
     Fetch the user's repositories from the GitHub API
+    Using Query Parameter 'per_page=100' to get all repositories.
+    The GitHub API returns a maximum of 100 repositories per page.
     """
 
+    page = 1
+    all_repos = []
     url = f"https://api.github.com/users/{username}/repos"
-    response = safe_get(url)
-    return response.json()
+
+    while True:
+        params = {"per_page": 100, "page": page}    # Query parameters to fetch 100 repositories per page
+        response = safe_get(url, params=params)
+        repos = response.json()
+
+        # If the response is empty or None, it means there are no more repositories to fetch, there was an error
+        # or the user has no public repositories, so we break the loop
+        if not repos:
+            break
+
+        all_repos.extend(repos)
+
+        if len(repos) < 100:
+            break  # No more pages to fetch
+
+        page += 1
+
+    return all_repos
 
 def fetch_user_id(username: str) -> int:
     """
