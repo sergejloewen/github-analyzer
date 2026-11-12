@@ -63,6 +63,7 @@ DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/github_analyzer
 TEST_DATABASE_URL=postgresql+psycopg://user:password@localhost:5432/github_analyzer_test
 ```
 
+*(Note: Without a `GITHUB_TOKEN`, the GitHub API enforces a strict rate limit of 60 requests per hour, which can block requests when analyzing users with many repositories.)*
 *(Note: The `.env`-file is included in `.gitignore` and will not be committed to version control.)*
 
 ### 2. Start the Application
@@ -112,13 +113,7 @@ to run the test suite locally using `uv`:
     uv run pytest
     ```
 
-## Known Limitations
+## Design Decisions
 
-- **GitHub API Pagination:** Currently, repository queries return up to 30 items (the default GitHub API page size), except for commit counts per repository where pagination is already handled.
-- **Commit Attribution:** `total_commits` reflects all commits within a user's repositories, which may include contributions from other collaborators in shared repositories.
-- **API Rate Limits:** Running the app without a `GITHUB_TOKEN` subjects requests to GitHub's unauthenticated rate limit (60 requests/hour).
-
-## Future Plans
-
-- Implement full pagination support for all GitHub API endpoints.
-- Provide pre-built Docker images on Docker Hub / GitHub Container Registry for faster setup.
+- **Pagination Handling (`per_page=100`):** To fetch complete repository lists without excessive network overhead, the backend uses GitHub's maximum page size (`per_page=100`) and iterates through pages dynamically until all repositories are retrieved.
+- **Avoiding N+1 API Requests (Excluding Commit Counts):** Initially, commit counts were fetched per repository. Because the GitHub REST API requires a separate request for each repository's commits, this caused an N+1 request pattern, severely increasing response times and exhausting unauthenticated rate limits (60 requests/hour). Removing per-repo commit queries keeps user lookups fast (typically 1–2 API calls per user) while still capturing key metrics like stars, languages, and repository counts.
