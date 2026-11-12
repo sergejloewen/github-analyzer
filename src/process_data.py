@@ -45,7 +45,7 @@ def safe_get(url: str, params: dict | None = None, headers: dict | None = None) 
     """
     headers = {"Accept": "application/vnd.github+json"}
 
-    token = os.getenv("GITHUB_TOKEN")
+    token = os.getenv("GITHUB_TOKEN", "").strip() # Get the GitHub token from environment variables and strip any whitespace
     if token:
         headers["Authorization"] = f"Bearer {token}"
 
