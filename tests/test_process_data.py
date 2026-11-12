@@ -213,8 +213,8 @@ def test_fetch_user_repos_too_many_requests():
 @responses.activate
 def test_fetch_user_repos_GitHubAPI_error():
     """
-    Test fetching repositories when a network error occurs.
-    Should raise a GitHubNetworkError.
+    Test fetching repositories when a GitHub API error occurs.
+    Should raise a GitHubAPIError.
     """
 
     username = "octocat"
